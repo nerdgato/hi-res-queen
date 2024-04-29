@@ -55,11 +55,9 @@ Make sure to configure the following variables in the `.env` file:
 
 ## Usage
 1. To create the JSON file, while in a voice channel you have to use `/gen_database`. You need to use this command whenever you add new music to the specified path.
-<div align=center>
+<div>
   <img src="https://imgur.com/OE2TbmZ.png" width=300px>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://imgur.com/nESSRtt.png" width=300px>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="https://imgur.com/Hsb26RK.png" width=300px>
 </div>
 
@@ -72,10 +70,8 @@ Make sure to configure the following variables in the `.env` file:
 
 Contributions are welcome! If you encounter any issues or have suggestions for improvements, please open an issue or submit a pull request.
 
-<div align=center>
+<div>
   <img src="https://imgur.com/cG8hTZe.png" width=450px>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://imgur.com/B2Fqybr.gif" width=450px>
 </div>
 
 
