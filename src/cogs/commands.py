@@ -13,13 +13,13 @@ class Commands(commands.Cog):
         self.song_queue = []
         self.now_playing = None
         self.song_database = None
-        self.disconnect_timer = None  # Temporizador de desconexi贸n
-        self.folder_id = config("FOLDER")  # FOLDER_ID de OneDrive
+        self.disconnect_timer = None  # Temporizador de desconexión
+
         
     @commands.Cog.listener()
     async def on_ready(self):
         print("Cog de Comandos cargado correctamente.")
-        self.load_song_database()  # Cargamos la base de datos de canciones cuando el bot est谩 listo
+        self.load_song_database()  # Cargamos la base de datos de canciones cuando el bot está listo
     
     def load_song_database(self):
         # Cargamos la base de datos de canciones desde el archivo JSON
@@ -55,16 +55,16 @@ class Commands(commands.Cog):
         if ctx.voice_client:
             await ctx.voice_client.disconnect()
             self.song_queue.clear()
-            self.cancel_disconnect_timer()  # Cancela el temporizador de desconexi贸n si existe
+            self.cancel_disconnect_timer()  # Cancela el temporizador de desconexión si existe
             print("Bot desconectado del canal de voz.")
         else:
-            await ctx.send("No estoy en un canal de voz... 馃ケ")
-        # Cancela el temporizador de desconexi贸n si se ejecuta el comando !leave
+            await ctx.send("No estoy en un canal de voz... ??")
+        # Cancela el temporizador de desconexión si se ejecuta el comando !leave
         self.cancel_disconnect_timer()
 
-    @commands.command(brief="A帽ade una canci贸n por nombre de archivo.", help="A帽ade una canci贸n por nombre de archivo.\n\nPar谩metros:\n-s: Buscar por t铆tulo de la canci贸n.\n-a: Buscar por nombre del artista.\n-l: Buscar por nombre del 谩lbum.", aliases=["p", "P"])
+    @commands.command(brief="A?ade una canción por nombre de archivo.", help="A?ade una canción por nombre de archivo.\n\nParámetros:\n-s: Buscar por título de la canción.\n-a: Buscar por nombre del artista.\n-l: Buscar por nombre del álbum.", aliases=["p", "P"])
     async def play(self, ctx, *, query):
-        # Convertir todos los comandos y argumentos a min煤sculas
+        # Convertir todos los comandos y argumentos a minúsculas
         query = query.lower()
         if not ctx.voice_client:
             await ctx.invoke(self.join)
@@ -78,14 +78,14 @@ class Commands(commands.Cog):
         if not ctx.voice_client.is_playing() and not ctx.voice_client.is_paused():
             await self.play_song(ctx)
         else:
-            # Obtener el t铆tulo de la 煤ltima canci贸n agregada a la cola
+            # Obtener el título de la última canción agregada a la cola
             last_song_data = target_songs[-1]
             last_song_title = last_song_data["title"]
             last_artist = last_song_data["artist"]
-            # Crear un mensaje embed para notificar que la canci贸n se ha agregado a la cola
+            # Crear un mensaje embed para notificar que la canción se ha agregado a la cola
             embed = discord.Embed(
-                title="Canci贸n Agregada a la Cola",
-                description=f"La canci贸n **{last_song_title}** de **{last_artist}** se ha agregado a la cola.",
+                title="Canción Agregada a la Cola",
+                description=f"La canción **{last_song_title}** de **{last_artist}** se ha agregado a la cola.",
                 color=discord.Color.from_rgb(255, 255, 255)  # Color azul por defecto
             )
             embed.set_thumbnail(url=thumbnail_url)
@@ -100,18 +100,18 @@ class Commands(commands.Cog):
             song_query = " ".join(play_args[song_index:])
             target_songs = self.search_by_song(song_query)
 
-            # Calcular la puntuaci贸n de cada canci贸n basada en la similitud del t铆tulo con la consulta
+            # Calcular la puntuación de cada canción basada en la similitud del título con la consulta
             for song in target_songs:
                 song["score"] = self.calculate_similarity(song["title"], song_query)
 
-            # Ordenar las canciones por puntuaci贸n de mayor a menor
+            # Ordenar las canciones por puntuación de mayor a menor
             target_songs.sort(key=lambda x: x["score"], reverse=True)
 
-            if len(target_songs) > 1:  # Si hay m谩s de una canci贸n con el mismo nombre
+            if len(target_songs) > 1:  # Si hay más de una canción con el mismo nombre
                 # Crear un mensaje embed con la lista de canciones
                 thumbnail_url = "https://imgur.com/cG8hTZe.png"
                 embed = discord.Embed(
-                    title="M煤ltiples Canciones Encontradas",
+                    title="Múltiples Canciones Encontradas",
                     description="Se encontraron varias canciones con ese nombre. Por favor, elige una:",
                     color=discord.Color.from_rgb(255, 255, 255)  # Color azul por defecto
                 )
@@ -126,38 +126,38 @@ class Commands(commands.Cog):
                 try:
                     response = await self.bot.wait_for('message', check=check, timeout=30.0)  # Esperar la respuesta del usuario durante 30 segundos
 
-                    # Verificar si la respuesta es un n煤mero entero v谩lido dentro del rango de opciones
+                    # Verificar si la respuesta es un número entero válido dentro del rango de opciones
                     choice = int(response.content)
                     if 1 <= choice <= len(target_songs):
-                        # Obtener la canci贸n seleccionada
+                        # Obtener la canción seleccionada
                         selected_song = target_songs[choice - 1]
-                        # Agregar la canci贸n a la cola
+                        # Agregar la canción a la cola
                         self.song_queue.append(selected_song)
-                        # Reproducir la canci贸n si no hay ninguna reproduci茅ndose
+                        # Reproducir la canción si no hay ninguna reproduciéndose
                         if not ctx.voice_client.is_playing() and not ctx.voice_client.is_paused():
                             await self.play_song(ctx)
                         else:
-                            # Crear un mensaje embed para notificar que la canci贸n se ha agregado a la cola
+                            # Crear un mensaje embed para notificar que la canción se ha agregado a la cola
                             thumbnail_url = "https://imgur.com/IKsan7z.png"
                             
                             last_song_title = selected_song["title"]
                             last_artist = selected_song["artist"]
                             
                             embed = discord.Embed(
-                                title="Canci贸n Agregada a la Cola",
-                                description=f"La canci贸n **{last_song_title}** de **{last_artist}** se ha agregado a la cola.",
+                                title="Canción Agregada a la Cola",
+                                description=f"La canción **{last_song_title}** de **{last_artist}** se ha agregado a la cola.",
                                 color=discord.Color.from_rgb(255, 255, 255)  # Color azul por defecto
                             )
                             embed.set_thumbnail(url=thumbnail_url)
                             await ctx.send(embed=embed)
                                             
-                        # # Reproducir la canci贸n si no hay ninguna reproduci茅ndose
+                        # # Reproducir la canción si no hay ninguna reproduciéndose
                         # if not ctx.voice_client.is_playing() and not ctx.voice_client.is_paused():
                         #     await self.play_song(ctx)
                     else:
-                        await ctx.send("El n煤mero ingresado no corresponde a una canci贸n v谩lida.")
+                        await ctx.send("El número ingresado no corresponde a una canción válida.")
                 except asyncio.TimeoutError:
-                    await ctx.send("Se ha agotado el tiempo para seleccionar una canci贸n.")
+                    await ctx.send("Se ha agotado el tiempo para seleccionar una canción.")
                 return 
 
 
@@ -182,7 +182,7 @@ class Commands(commands.Cog):
         return [song for song in self.song_database if song_query.lower().replace("'", "") in song["title"].lower().replace("'", "")]
 
     def calculate_similarity(self, title, query):
-        # Calcular la similitud utilizando la funci贸n ratio de SequenceMatcher
+        # Calcular la similitud utilizando la función ratio de SequenceMatcher
         similarity = SequenceMatcher(None, title.lower(), query.lower()).ratio()
         return similarity
     
@@ -200,7 +200,7 @@ class Commands(commands.Cog):
                 cover_file = None
                 
 
-            # Crear el mensaje embed para la canci贸n seleccionada
+            # Crear el mensaje embed para la canción seleccionada
             embed = discord.Embed(
                 title="Reproduciendo",
                 description=f"**{song_data['artist']}** - **{song_data['title']}**",
@@ -210,29 +210,29 @@ class Commands(commands.Cog):
             if cover_file:
                 embed.set_thumbnail(url=f"attachment://{cover_file.filename}")
 
-            # Agregar el 谩lbum al mensaje embed si est谩 disponible
+            # Agregar el álbum al mensaje embed si está disponible
             if "album" in song_data:
-                embed.add_field(name="脕lbum", value=song_data["album"], inline=True)
+                embed.add_field(name="álbum", value=song_data["album"], inline=True)
 
-            # Agregar el a帽o al mensaje embed si est谩 disponible
+            # Agregar el a?o al mensaje embed si está disponible
             if "year" in song_data:
-                embed.add_field(name="A帽o", value=song_data["year"], inline=True)
+                embed.add_field(name="A?o", value=song_data["year"], inline=True)
 
-            # Agregar la duraci贸n al mensaje embed si est谩 disponible
+            # Agregar la duración al mensaje embed si está disponible
             if "duration" in song_data:
-                embed.add_field(name="Duraci贸n", value=song_data["duration"], inline=True)
+                embed.add_field(name="Duración", value=song_data["duration"], inline=True)
 
-            # Agregar el bitrate al mensaje embed si est谩 disponible
+            # Agregar el bitrate al mensaje embed si está disponible
             if "bitrate" in song_data:
                 embed.add_field(name="Bitrate", value=str(song_data["bitrate"]) + " kb/s", inline=True)
 
             # Enviar el mensaje embed
             await ctx.send(embed=embed)
 
-            # Cancelar el temporizador de desconexi贸n
+            # Cancelar el temporizador de desconexión
             self.cancel_disconnect_timer()
 
-            # Esperar un momento despu茅s de conectar antes de reproducir la canci贸n
+            # Esperar un momento después de conectar antes de reproducir la canción
             await asyncio.sleep(0.5)
 
             # Cargar el audio
@@ -246,8 +246,8 @@ class Commands(commands.Cog):
             ctx.voice_client.play(audio_source, after=lambda e: self.bot.loop.call_soon_threadsafe(self.song_finished, ctx))
 
         except Exception as e:
-            print(f"Error al reproducir la canci贸n seleccionada: {str(e)}")
-            await ctx.send("Ocurri贸 un error al reproducir la canci贸n seleccionada.")
+            print(f"Error al reproducir la canción seleccionada: {str(e)}")
+            await ctx.send("Ocurrió un error al reproducir la canción seleccionada.")
 
     async def play_song(self, ctx):
         try:
@@ -282,17 +282,17 @@ class Commands(commands.Cog):
             if cover_file:
                 embed.set_thumbnail(url=f"attachment://{cover_file.filename}")
 
-            # Agregar el 谩lbum al mensaje embed si est谩 disponible
+            # Agregar el álbum al mensaje embed si está disponible
             if "album" in song_data:
-                embed.add_field(name="脕lbum", value=song_data["album"], inline=True)
+                embed.add_field(name="álbum", value=song_data["album"], inline=True)
 
-            # Agregar el a帽o al mensaje embed si est谩 disponible
+            # Agregar el a?o al mensaje embed si está disponible
             if "year" in song_data:
-                embed.add_field(name="A帽o", value=song_data["year"], inline=True)
+                embed.add_field(name="A?o", value=song_data["year"], inline=True)
                    
             
             if "duration" in song_data:
-                embed.add_field(name="Duraci贸n", value=song_data["duration"], inline=True)
+                embed.add_field(name="Duración", value=song_data["duration"], inline=True)
             
             if "bitrate" in song_data:
                 embed.add_field(name="Bitrate", value=str(song_data["bitrate"]) + " kb/s", inline=True )
@@ -300,10 +300,10 @@ class Commands(commands.Cog):
             # Enviar el mensaje embed con la miniatura adjunta
             await ctx.send(embed=embed, file=cover_file)
 
-            # Cancela el temporizador de desconexi贸n
+            # Cancela el temporizador de desconexión
             self.cancel_disconnect_timer()
             
-            # Esperar un momento despu茅s de conectar antes de reproducir la canci贸n
+            # Esperar un momento después de conectar antes de reproducir la canción
             await asyncio.sleep(0.5)
 
             # Cargar el audio
@@ -317,66 +317,66 @@ class Commands(commands.Cog):
             ctx.voice_client.play(audio_source, after=lambda e: self.bot.loop.call_soon_threadsafe(self.song_finished, ctx))
         
         except Exception as e:
-            print(f"Error al reproducir la canci贸n: {str(e)}")
-            await ctx.send("Ocurri贸 un error al reproducir la canci贸n.")
+            print(f"Error al reproducir la canción: {str(e)}")
+            await ctx.send("Ocurrió un error al reproducir la canción.")
 
     def song_finished(self, ctx):
-        # Verificar si hay m谩s canciones en la cola
+        # Verificar si hay más canciones en la cola
         if not self.song_queue:
-            # Si no hay m谩s canciones, reiniciar el temporizador
+            # Si no hay más canciones, reiniciar el temporizador
             self.reset_disconnect_timer()
         else:
-            # Si hay m谩s canciones en la cola, reproducir la siguiente
+            # Si hay más canciones en la cola, reproducir la siguiente
             asyncio.run_coroutine_threadsafe(self.play_song(ctx), self.bot.loop)
 
-    @commands.command(brief="Pausa la reproducci贸n actual.", help="Pausa la reproducci贸n actual.")
+    @commands.command(brief="Pausa la reproducción actual.", help="Pausa la reproducción actual.")
     async def pause(self, ctx):
         try:
             if ctx.voice_client.is_playing() or ctx.voice_client.is_paused():
                 ctx.voice_client.pause()
-                await ctx.send("Reproducci贸n pausada.")
+                await ctx.send("Reproducción pausada.")
             else:
-                await ctx.send("No hay ninguna reproducci贸n en curso.")
+                await ctx.send("No hay ninguna reproducción en curso.")
         except AttributeError:
-            await ctx.send("No estoy en un canal de voz... 馃ケ")
+            await ctx.send("No estoy en un canal de voz... ??")
 
-    @commands.command(brief="Reanuda la reproducci贸n.", help="Reanuda la reproducci贸n.")
+    @commands.command(brief="Reanuda la reproducción.", help="Reanuda la reproducción.")
     async def resume(self, ctx):
         try:
             if ctx.voice_client.is_paused():
                 ctx.voice_client.resume()
             else:
-                await ctx.send("La reproducci贸n no est谩 pausada.")
+                await ctx.send("La reproducción no está pausada.")
         except AttributeError:
-            await ctx.send("No estoy en un canal de voz... 馃ケ")
+            await ctx.send("No estoy en un canal de voz... ??")
 
-    @commands.command(brief="Salta la canci贸n actual.", help="Salta la canci贸n actual.\n\nAbreviaciones: !skip, !s, !S", aliases=["s", "S"] )
+    @commands.command(brief="Salta la canción actual.", help="Salta la canción actual.\n\nAbreviaciones: !skip, !s, !S", aliases=["s", "S"] )
     async def skip(self, ctx):
         try:
             if ctx.voice_client.is_playing():
                 ctx.voice_client.stop()
                 await self.play_song(ctx)
             else:
-                await ctx.send("No hay ninguna reproducci贸n en curso para saltar.")
+                await ctx.send("No hay ninguna reproducción en curso para saltar.")
         except AttributeError:
-            await ctx.send("No estoy en un canal de voz... 馃ケ")
+            await ctx.send("No estoy en un canal de voz... ??")
 
-    @commands.command(brief="Detiene la reproducci贸n actual y limpia la cola.", help="Detiene la reproducci贸n actual y limpia la cola sin salir del canal de voz.")
+    @commands.command(brief="Detiene la reproducción actual y limpia la cola.", help="Detiene la reproducción actual y limpia la cola sin salir del canal de voz.")
     async def stop(self, ctx):
         try:
             if ctx.voice_client.is_playing() or ctx.voice_client.is_paused():
                 ctx.voice_client.stop()
-                self.song_queue.clear()  # Limpia la cola de reproducci贸n
-                self.cancel_disconnect_timer()  # Cancela cualquier temporizador de desconexi贸n activo
-                await ctx.send("Reproducci贸n detenida y cola limpiada.")
+                self.song_queue.clear()  # Limpia la cola de reproducción
+                self.cancel_disconnect_timer()  # Cancela cualquier temporizador de desconexión activo
+                await ctx.send("Reproducción detenida y cola limpiada.")
             else:
-                await ctx.send("No hay ninguna reproducci贸n en curso para detener.")
+                await ctx.send("No hay ninguna reproducción en curso para detener.")
         except AttributeError:
-            await ctx.send("No estoy en un canal de voz... 馃ケ")
+            await ctx.send("No estoy en un canal de voz... ??")
     def reset_disconnect_timer(self):
-        # Cancela el temporizador de desconexi贸n si existe
+        # Cancela el temporizador de desconexión si existe
         self.cancel_disconnect_timer()
-        # Programa la desconexi贸n despu茅s de 3 minutos
+        # Programa la desconexión después de 3 minutos
         self.disconnect_timer = self.bot.loop.create_task(self.disconnect_after_timeout())
 
     def cancel_disconnect_timer(self):
@@ -386,7 +386,7 @@ class Commands(commands.Cog):
     async def disconnect_after_timeout(self):
         remaining_time = 180
         while remaining_time > 0:
-            print(f"Tiempo restante para la desconexi贸n autom谩tica: {remaining_time} segundos")
+            print(f"Tiempo restante para la desconexión automática: {remaining_time} segundos")
             await asyncio.sleep(10)  # Espera 10 segundos antes de verificar de nuevo
             remaining_time -= 10
 
