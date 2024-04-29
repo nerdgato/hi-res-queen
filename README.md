@@ -26,8 +26,9 @@ Maybe one day Discord will increase the transfer speed limit in voice chat.
 
 1. Clone this repository to your local machine.
 2. Install the required dependencies by running `pip install -r requirements.txt`.
-3. Set up your Discord bot token and other configurations in a `.env` file.
-4. Start the bot by running `python .\src\main.py`.
+3. Create `data` folder inside of the project.
+4. Set up your Discord bot token and other configurations in a `.env` file.
+5. Start the bot by running `python .\src\main.py`.
 
 ## Configuration
 
