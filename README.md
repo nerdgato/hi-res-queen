@@ -1,11 +1,10 @@
 # Hi-Res Queen
 
 This Discord bot allows users to play music in a voice channel from a pre-defined database of songs. Users can search for songs by title, artist, or album, and add them to the bot's queue for playback. The bot supports pausing, resuming, skipping, and stopping playback, as well as automatic disconnection from the voice channel after a period of inactivity.
-
-<div align="center">
-  <img src="https://imgur.com/IKsan7z.png" width=450px>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://imgur.com/N6yyXeT.png" width=477px>
+<div>
+  <img src="https://imgur.com/IKsan7z.png" width=300px>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://imgur.com/6kuwpaD.png" width=300px>
 </div>
 
 > [!NOTE]
